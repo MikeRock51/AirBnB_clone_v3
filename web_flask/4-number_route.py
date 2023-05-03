@@ -1,0 +1,41 @@
+#!/usr/bin/python3
+"""Starts a web application on 0.0.0.0:5000"""
+
+from flask import Flask
+
+app = Flask(__name__)
+
+
+@app.route('/', strict_slashes=False)
+def hello():
+    return "Hello HBNB!"
+
+
+@app.route('/hbnb', strict_slashes=False)
+def hbnb():
+    return "HBNB"
+
+
+@app.route('/c/<text>', strict_slashes=False)
+def aboutC(text):
+    """Returns a page based on parameter"""
+    text = text.replace("_", " ")
+    return "C {}".format(text)
+
+
+@app.route('/python', strict_slashes=False)
+@app.route('/python/<text>', strict_slashes=False)
+def aboutPython(text="is cool"):
+    text = text.replace('_', ' ')
+    return "Python {}".format(text)
+
+
+@app.route('/number/<int:n>', strict_slashes=False)
+def numberInit(n):
+    """Returns a page only if param is an integer"""
+    if type(n) == int:
+        return "{} is a number".format(n)
+
+
+if __name__ == "__main__":
+    app.run(debug=True, host='0.0.0.0')
