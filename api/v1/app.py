@@ -1,9 +1,7 @@
 #!/usr/bin/python3
-"""
-A flask web app that runs on 0.0.0.0:5000
-"""
+'''A flask web app that runs on 0.0.0.0:5000'''
 
-from flask import Flask
+from flask import Flask, make_response, jsonify
 from models import storage
 from api.v1.views import app_views
 from os import getenv
@@ -16,6 +14,12 @@ app.register_blueprint(app_views)
 def tearDown(self):
     """Removes the current SQLAlchemy Session"""
     storage.close()
+
+
+@app.errorhandler(404)
+def notFound(error):
+    """Returns a JSON formatted not found response"""
+    return make_response(jsonify({'error': 'Not found'}))
 
 
 if __name__ == '__main__':
