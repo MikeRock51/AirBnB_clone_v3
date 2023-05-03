@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """
-Index module file
+    Index module file: routes are defined here
 """
 
 from api.v1.views import app_views
