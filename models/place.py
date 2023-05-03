@@ -53,7 +53,6 @@ class Place(BaseModel, Base):
 
     def __init__(self, *args, **kwargs):
         """Initializes a Place instance"""
-        print("WIIIII")
         super().__init__(*args, **kwargs)
 
     if getenv('HBNB_TYPE_STORAGE') != 'db':

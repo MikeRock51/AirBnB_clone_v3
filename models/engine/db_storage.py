@@ -21,7 +21,8 @@ class DBStorage:
             .format(user, pwd, host, db), pool_pre_ping=True)
 
         if getenv('HBNB_ENV') == 'test':
-            Base.metadata.drop_all(engine)
+            from models.base_model import Base
+            Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
         """Returns a dictionary of all objects from the database"""
@@ -74,6 +75,22 @@ class DBStorage:
         session_factory = sessionmaker(
             bind=self.__engine, expire_on_commit=False)
         self.__session = scoped_session(session_factory)
+
+    def get(self, cls, id):
+        """Retrieves a single object"""
+        objs = self.all(cls)
+        for obj in objs.values():
+            if obj.id == id:
+                return obj
+        return None
+
+    def count(self, cls=None):
+        """Counts the number of objects in storage"""
+        if cls:
+            objs = self.all(cls)
+        else:
+            objs = self.all()
+        return len(objs)
 
     def close(self):
         """Removes the current session"""
