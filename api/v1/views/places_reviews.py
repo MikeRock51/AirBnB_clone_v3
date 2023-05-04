@@ -34,4 +34,29 @@ def fetchReview(review_id):
 @app_views.route('/reviews/<review_id>', methods=['DELETE'])
 def deleteReview(review_id):
     """Deletes the Review object with the review_id"""
+    review = storage.get(Review, review_id)
+    if not review:
+        abort(404)
+    storage.delete(review)
+    return make_response(jsonify({}), 200)
+
+
+@app_views.route('/places/<place_id>/reviews', methods=['POST'])
+def createReview(place_id):
+    """Creates a Review object under the Place with place_id"""
+    if not storage.get(Place, place_id):
+        abort(404)
+    reviewInfo = request.get_json()
+    if type(reviewInfo) != dict:
+        return make_response(jsonify({"error": "Not a JSON"}), 400)
+    elif 'user_id' not in reviewInfo.keys():
+        return make_response(jsonify({"error": "Missing user_id"}), 400)
+    elif not storage.get(User, reviewInfo['user_id']):
+        abort(404)
+    elif 'text' not in reviewInfo.keys():
+        return make_response(jsonify({"error": "Missing text"}), 400)
+    reviewInfo['place_id'] = place_id
+    review = Review(**reviewInfo)
+    review.save()
+    return make_response(jsonify(review.to_dict()), 201)
 
