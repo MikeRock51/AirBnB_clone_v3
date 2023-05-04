@@ -35,3 +35,37 @@ def deleteAmenity(amenity_id):
         abort(404)
     amenity.delete()
     return make_response(jsonify({}), 200)
+
+
+@app_views.route('/amenities', methods=['POST'])
+def createAmenity():
+    """Creates a new Amenity object"""
+    amenityInfo = request.get_json()
+
+    if type(amenityInfo) != dict:
+        return make_response(jsonify({"error": "Not a JSON"}), 400)
+    elif 'name' not in amenityInfo:
+        return make_response(jsonify({"error": "Missing name"}), 400)
+
+    amenity = Amenity(**amenityInfo)
+    amenity.save()
+    return make_response(jsonify(amenity.to_dict()), 201)
+
+
+@app_views.route('/amenities/<amenity_id>', methods=['PUT'])
+def updateAmenity(amenity_id):
+    """Updates an Amenity object with given amenity_id"""
+    amenity = storage.get(Amenity, amenity_id)
+    amenityInfo = request.get_json()
+
+    if not amenity:
+        abort(404)
+    if type(amenityInfo) != dict:
+        return make_response(jsonify({"error": "Not a JSON"}), 400)
+
+    ignoredAttr = ['id', 'created_at', 'updated_at']
+    for key, value in amenityInfo.items():
+        if key not in ignoredAttr:
+            setattr(amenity, key, value)
+    amenity.save()
+    return make_response(jsonify(amenity.to_dict()), 200)
