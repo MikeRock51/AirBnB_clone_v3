@@ -61,4 +61,17 @@ def createCity(state_id):
 @app_views.route('/cities/<city_id>', methods=['PUT'])
 def updateCity(city_id):
     """Updates the City with the given city_id"""
+    city = storage.get(City, city_id)
+    cityInfo = request.get_json()
+    if not city:
+        abort(404)
+    if not cityInfo or type(cityInfo) != dict:
+        make_response(jsonify({"error": "Not a JSON"}), 400)
+    ignoredAttr = ['id', 'state_id', 'created_at', 'updated_at']
 
+    for key, value in cityInfo.items():
+        if key not in ignoredAttr:
+            setattr(city, key, value)
+    city.save()
+
+    return make_response(jsonify(city.to_dict()), 200)
