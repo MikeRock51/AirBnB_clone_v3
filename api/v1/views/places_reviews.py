@@ -60,3 +60,20 @@ def createReview(place_id):
     review.save()
     return make_response(jsonify(review.to_dict()), 201)
 
+
+@app_views.route('/reviews/<review_id>', methods=['PUT'])
+def updateReview(review_id):
+    """Updates the Review object with review_id"""
+    review = storage.get(Review, review_id)
+    if not review:
+        abort(404)
+    reviewInfo = request.get_json()
+    if type(reviewInfo) != dict:
+        return make_response(jsonify({"error": "Not a JSON"}), 400)
+    ignoredKeys = ['id, user_id', 'place_id', 'created_at', 'updated_at']
+
+    for key, value in reviewInfo.items():
+        if key not in ignoredKeys:
+            setattr(review, key, value)
+    review.save()
+    return make_response(jsonify(review.to_dict()), 200)
