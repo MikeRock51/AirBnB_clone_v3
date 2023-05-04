@@ -42,7 +42,7 @@ def deleteState(state_id):
 def createState():
     """Creates a new state object"""
     stateInfo = request.get_json()
-    if not stateInfo:
+    if not stateInfo or type(stateInfo) != dict:
         return make_response(jsonify({"error": "Not a JSON"}), 400)
     elif "name" not in stateInfo:
         return make_response(jsonify({"error": "Missing name"}), 400)
@@ -50,3 +50,21 @@ def createState():
     newState = State(**stateInfo)
     newState.save()
     return make_response(jsonify(newState.to_dict()), 201)
+
+
+@app_views.route('/states/<string:state_id>', methods=['PUT'])
+def updateState(state_id):
+    """Updates the state with the specified state_id"""
+    state = storage.get(State, state_id)
+    stateInfo = request.get_json()
+    if not state:
+        abort(404)
+    elif not stateInfo or type(stateInfo) != dict:
+        return make_response(jsonify({"error": "Not a JSON"}), 400)
+
+    ignoredAttr = ['id', 'created_at', 'updated_at']
+    for key, value in stateInfo.items():
+        if key not in ignoredAttr:
+            setattr(state, key, value)
+    state.save()
+    return make_response(jsonify(state.to_dict()), 200)
