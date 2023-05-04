@@ -60,3 +60,22 @@ def createPlace(city_id):
     place = Place(**placeInfo)
     place.save()
     return make_response(jsonify(place.to_dict()), 201)
+
+
+@app_views.route('/places/<place_id>', methods=['PUT'])
+def updatePlace(place_id):
+    """Updates the Place object with the place_id"""
+    place = storage.get(Place, place_id)
+    if not place:
+        abort(404)
+    placeInfo = request.get_json()
+    if type(placeInfo) != dict:
+        return make_response(jsonify({"error": "Not a JSON"}), 400)
+
+    ignoredKeys = ['id', 'user_id', 'city_id', 'created_at', 'updated_at']
+
+    for key, value in placeInfo.items():
+        if key not in ignoredKeys:
+            setattr(place, key, value)
+    place.save()
+    return make_response(jsonify(place.to_dict()), 200)
