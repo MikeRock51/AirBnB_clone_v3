@@ -2,14 +2,14 @@
 '''A flask web app that runs on 0.0.0.0:5000'''
 
 from flask import Flask, make_response, jsonify
+from flask_cors import CORS
 from models import storage
 from api.v1.views import app_views
 from os import getenv
-from flask_cors import CORS
 
 app = Flask(__name__)
-cors = CORS(app, origins="0.0.0.0")
 app.register_blueprint(app_views)
+cors = CORS(app, resources={r"/*": {"origins": '0.0.0.0'}})
 
 
 @app.teardown_appcontext
@@ -33,6 +33,6 @@ if __name__ == '__main__':
     if getenv('HBNB_API_PORT'):
         port = getenv('HBNB_API_PORT')
     else:
-        port = 5000
+        port = 5002
 
     app.run(debug=True, host=host, port=port, threaded=True)
